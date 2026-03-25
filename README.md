@@ -1,34 +1,82 @@
-# meetup.com-auto--RSVP
-## Project Overview
-This project  is a command-line utility designed to automate the RSVP process for specific Meetup.com groups. In highly popular groups where event spots fill up within minutes, this bot ensures you get a seat by periodically checking for new events and signing up automatically.
+## Meetup RSVP Bot
 
- ## Features
-- Targeted Monitoring: Only searches for events in groups specifically configured by the user.
+A command-line automation tool that automatically RSVPs to events on Meetup for selected groups. This tool ensures you never miss high-demand events by registering as soon as they become available.
 
-- Automated Authentication: Handles secure user authentication to act on the user's behalf.
+##  Features
+-  Automated RSVP for Meetup events
+-   Persistent login using Playwright (no repeated authentication)
+-   etches upcoming events from selected groups
+-  Fast and reliable registration for limited-seat events
+-  Modular and maintainable code structure
+-  Designed to run on Linux (cron-compatible)
+-  How It Works
 
-- Linux Optimized: Designed to run seamlessly as a background process or via cron jobs.
+## The project is divided into three main components:
 
-- Lightweight & Efficient: Built with Python for high readability and easy maintenance.
+# Authentication (auth/login.py)
+- Uses Playwright to launch a Chrome browser
+- Stores session data locally using a persistent profile
+- Requires one-time manual login
+- Session is reused for future runs
+#  Event Fetching (meetup/events.py)
+- Navigates to /events page of a Meetup group
+- Extracts event URLs dynamically
+- Filters invalid or duplicate links
+- Returns a list of upcoming events
+# Auto RSVP (meetup/auto_rsvp.py)
+- Opens each event page
+- Detects RSVP button
+- Automatically registers the user
 
-##  Tech Stack & Architecture
-- Language: Python
+## Project Structure 
+```
+Meetup-RSVP-Bot/
+│
+├── auth/
+│   └── login.py          # Handles login and session persistence
+│
+├── meetup/
+│   ├── __init__.py
+│   ├── events.py         # Scrapes event URLs
+│   └── auto_rsvp.py      # Performs RSVP automation
+│
+├── chrome_profile/       # Stores browser session (auto-created)
+└── README.md
+```
 
-- Libraries: requests (for API interaction/scraping), json (for configuration management).
+## Installation
+-  Clone the repository
+git clone https://github.com/your-username/Meetup-RSVP-Bot.git
+cd Meetup-RSVP-Bot
+- Install dependencies
+    1. pip install playwright
+    2. playwright install
 
-- Automation: Compatible with crontab for scheduled execution.
+## Setup Authentication
 
-- The system is designed with a modular architecture:
+Run the login script:
 
-- Config Loader: Reads group IDs and user credentials from a secure local environment.
+``` 
+python auth/login.py
+```
+A Chrome window will open
+Log in manually to Meetup
+Keep the window open for a few seconds
+Session will be saved automatically
 
-- Scanner: Polls the Meetup API/Web interface for "Open" status events.
+## Automating with Cron (Linux)
 
-- Action Engine: Executes the POST request to join the event if the user is not already RSVP'd.
+- To run the bot every hour:
 
-## Prerequisites
-- Python 3.8 or higher
+``` 
+crontab -e
+ ```
 
-- A Linux environment (Ubuntu/Debian preferred)
+- Add:
 
-- Meetup.com account credentials
+```
+0 * * * * /usr/bin/python3 /path/to/your/script.py
+```
+
+
+
